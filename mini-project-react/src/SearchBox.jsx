@@ -3,47 +3,51 @@ import Button from '@mui/material/Button';
 import "./SearchBox.css";
 import { useState } from "react";
 
-export default function SearchBox() {
-    let [city, setCity] = useState("");
+// eslint-disable-next-line react/prop-types
+export default function SearchBox({ updateInfo }) {
+    const [city, setCity] = useState("");
     const API_KEY = "1ab0a889120a839370375f558a67cc3e";
 
-    let getWeatherInfo = async () => {
+    const getWeatherInfo = async () => {
         const API_URL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
         try {
-            let response = await fetch(API_URL);
+            const response = await fetch(API_URL);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            let jsonResponse = await response.json();
-                let result = {
+            const jsonResponse = await response.json();
+            const result = {
                 city: city,    
                 temp: jsonResponse.main.temp,
                 tempMin: jsonResponse.main.temp_min,
                 tempMax: jsonResponse.main.temp_max,
                 humidity: jsonResponse.main.humidity,
-                feelsLike: jsonResponse.main.feels_like,
+                feelslike: jsonResponse.main.feels_like,
                 weather: jsonResponse.weather[0].description,
             };
             console.log(result);
+            return result;
         } catch (error) {
             console.error("Error fetching weather data:", error);
         }
     };
 
-    let handleChange = (evt) => {
+    const handleChange = (evt) => {
         setCity(evt.target.value);
     };
 
-    let handleSubmit = (evt) => {
+    const handleSubmit = async (evt) => {
         evt.preventDefault();
         console.log(city);
-        getWeatherInfo();
+        const newInfo = await getWeatherInfo();
+        if (newInfo) {
+            updateInfo(newInfo);
+        }
         setCity("");
     };
 
     return (
         <div className="SearchBox">
-            <h3>Search for the Weather</h3>
             <form onSubmit={handleSubmit}>
                 <TextField 
                     id="city" 
